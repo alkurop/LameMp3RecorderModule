@@ -1,0 +1,3 @@
+include ':lib-lame-mp3-recorder'
+include ':app'
+rootProject.name = "LibLameMp3Recorder"
