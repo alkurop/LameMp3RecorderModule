@@ -38,7 +38,7 @@ public class LameModule {
      * -3: lame_init_params() not called<br />
      * -4: psycho acoustic problems
      */
-    public native static int encode(short[] buffer_l, short[] buffer_r, int samples, byte[] mp3buf);
+    public native static int encode(byte[] buffer_l, byte[] buffer_r, int samples, byte[] mp3buf);
 
     /**
      * Flush LAME buffer.

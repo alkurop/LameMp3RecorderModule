@@ -21,7 +21,7 @@ JNIEXPORT void JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_in
  * Signature: ([S[SI[B)I
  */
 JNIEXPORT jint JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_encode
-  (JNIEnv *, jclass, jshortArray, jshortArray, jint, jbyteArray);
+  (JNIEnv *, jclass, jbyteArray, jbyteArray, jint, jbyteArray);
 
 /*
  * Class:     com_omar_retromp3recorder_app_recorder_LameModule

@@ -21,11 +21,11 @@ JNIEXPORT void JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_in
 }
 
 JNIEXPORT jint JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_encode(
-		JNIEnv *env, jclass cls, jshortArray buffer_l, jshortArray buffer_r,
+		JNIEnv *env, jclass cls, jbyteArray buffer_l, jbyteArray buffer_r,
 		jint samples, jbyteArray mp3buf) {
-	jshort* j_buffer_l = (*env)->GetShortArrayElements(env, buffer_l, NULL);
+	jbyte* j_buffer_l = (*env)->GetByteArrayElements(env, buffer_l, NULL);
 
-	jshort* j_buffer_r = (*env)->GetShortArrayElements(env, buffer_r, NULL);
+	jbyte* j_buffer_r = (*env)->GetByteArrayElements(env, buffer_r, NULL);
 
 	const jsize mp3buf_size = (*env)->GetArrayLength(env, mp3buf);
 	jbyte* j_mp3buf = (*env)->GetByteArrayElements(env, mp3buf, NULL);
@@ -33,8 +33,8 @@ JNIEXPORT jint JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_en
 	int result = lame_encode_buffer(glf, j_buffer_l, j_buffer_r,
 			samples, j_mp3buf, mp3buf_size);
 
-	(*env)->ReleaseShortArrayElements(env, buffer_l, j_buffer_l, 0);
-	(*env)->ReleaseShortArrayElements(env, buffer_r, j_buffer_r, 0);
+	(*env)->ReleaseByteArrayElements(env, buffer_l, j_buffer_l, 0);
+	(*env)->ReleaseByteArrayElements(env, buffer_r, j_buffer_r, 0);
 	(*env)->ReleaseByteArrayElements(env, mp3buf, j_mp3buf, 0);
 
 	return result;
