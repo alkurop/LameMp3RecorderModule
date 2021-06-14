@@ -25,6 +25,6 @@ $(LAME_LIBMP3_DIR)/set_get.c \
 $(LAME_LIBMP3_DIR)/takehiro.c \
 $(LAME_LIBMP3_DIR)/vbrquantize.c \
 $(LAME_LIBMP3_DIR)/version.c \
-com_omar_retromp3recorder_app_recorder_LameModule.c
+com_omar_retromp3recorder_app_recorder_LameModule.cpp
 
 include $(BUILD_SHARED_LIBRARY)
