@@ -1,9 +1,38 @@
 #include "com_omar_retromp3recorder_app_recorder_LameModule.h"
 #include "libmp3lame/lame.h"
+#include <new>
+#include <iostream>
 
 
 static lame_global_flags *glf = NULL;
 
+void rethrow_cpp_exception_as_java_exception(JNIEnv *env) {
+    try {
+        throw; // This allows to determine the type of the exception
+    }
+    catch (const std::bad_alloc &e) {
+        jclass jc = env->FindClass("java/lang/OutOfMemoryError");
+        if (jc) env->ThrowNew(jc, e.what());
+    }
+    catch (const std::ios_base::failure &e) {
+        jclass jc = env->FindClass("java/io/IOException");
+        if (jc) env->ThrowNew(jc, e.what());
+    }
+    catch (const std::exception &e) {
+        /* unknown exception (may derive from std::exception) */
+        jclass jc = env->FindClass("java/lang/Error");
+        if (jc) env->ThrowNew(jc, e.what());
+    }
+    catch (...) {
+        /* Oops I missed identifying this exception! */
+        jclass jc = env->FindClass("java/lang/Error");
+        if (jc)
+            env->ThrowNew(jc, "Unidentified exception => "
+                              "Improve rethrow_cpp_exception_as_java_exception()");
+    }
+}
+
+extern "C"
 JNIEXPORT void JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_init(
         JNIEnv *env, jclass cls, jint inSamplerate, jint outChannel,
         jint outSamplerate, jint outBitrate, jint quality) {
@@ -20,6 +49,7 @@ JNIEXPORT void JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_in
     lame_init_params(glf);
 }
 
+extern "C"
 JNIEXPORT jint JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_encode(
         JNIEnv *env, jclass cls, jshortArray buffer_l, jshortArray buffer_r,
         jint samples, jbyteArray mp3buf) {
@@ -40,20 +70,29 @@ JNIEXPORT jint JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_en
     return result;
 }
 
+extern "C"
 JNIEXPORT jint JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_flush(
         JNIEnv *env, jclass cls, jbyteArray mp3buf) {
-    const jsize mp3buf_size = env->GetArrayLength(mp3buf);
-    jbyte *j_mp3buf = env->GetByteArrayElements(mp3buf, 0);
+    try {
+        const jsize mp3buf_size = env->GetArrayLength(mp3buf);
+        jbyte *j_mp3buf = env->GetByteArrayElements(mp3buf, 0);
 
-    int result = lame_encode_flush(glf, (unsigned char *) j_mp3buf, mp3buf_size);
+        int result = lame_encode_flush(glf, (unsigned char *) j_mp3buf, mp3buf_size);
 
-    env->ReleaseByteArrayElements(mp3buf, j_mp3buf, 0);
+        env->ReleaseByteArrayElements(mp3buf, j_mp3buf, 0);
 
-    return result;
+        return result;
+    } catch (...) {
+        rethrow_cpp_exception_as_java_exception(env);
+        return 0;
+    }
 }
 
+extern "C"
 JNIEXPORT void JNICALL Java_com_omar_retromp3recorder_app_recorder_LameModule_close(
         JNIEnv *env, jclass cls) {
     lame_close(glf);
     glf = NULL;
 }
+
+
